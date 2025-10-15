@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>For My Gugu ❤️ - A Forever Quiz</title>
+<link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+    :root {
+        --main-color: #ff4d6d; /* Deep Pink/Red */
+        --accent-color: #ffc3e0; /* Light Pink */
+        --bg-start: #ff0000;
+        --bg-end: #ff7373;
+    }
+
+    body {
+        margin: 0;
+        /* Using the romantic font */
+        font-family: 'Poppins', sans-serif;
+        text-align: center;
+        background: linear-gradient(135deg, var(--bg-start), var(--bg-end), var(--main-color));
+        background-size: 400% 400%;
+        animation: gradientFlow 12s ease infinite;
+        overflow-x: hidden; /* Prevent horizontal scroll */
+        color: white;
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
+    }
+
+    @keyframes gradientFlow {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+
+    .heart-border {
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        background-image: radial-gradient(circle at center, transparent 35%, rgba(255,255,255,0.1) 36%, transparent 37%);
+        background-repeat: repeat;
+        background-size: 80px 80px;
+        animation: pulse 4s infinite;
+        z-index: -1;
+    }
+
+    @keyframes pulse {
+        0%,100% { opacity: 0.2; }
+        50% { opacity: 0.5; }
+    }
+
+    .container {
+        max-width: 600px;
+        width: 90%;
+        margin: 40px auto;
+        background: rgba(255, 255, 255, 0.15);
+        border-radius: 30px;
+        padding: 40px;
+        box-shadow: 0 0 40px rgba(0, 0, 0, 0.5);
+        backdrop-filter: blur(15px);
+        position: relative;
+        transform: scale(0.95);
+        transition: transform 0.5s ease-out;
+    }
+    
+    .container:not(.hidden) {
+        transform: scale(1);
+    }
+
+
+    h1, h2 {
+        font-family: 'Dancing Script', cursive;
+        font-size: 2.5em;
+        text-shadow: 0 0 15px var(--accent-color);
+        margin-bottom: 20px;
+        line-height: 1.2;
+    }
+
+    .question-title {
+        font-family: 'Poppins', sans-serif;
+        font-size: 1.2em;
+        font-weight: 300;
+        margin-bottom: 30px;
+    }
+
+    .option {
+        display: block;
+        background: rgba(255,255,255,0.25);
+        margin: 12px auto;
+        width: 90%;
+        padding: 18px;
+        border-radius: 25px;
+        cursor: pointer;
+        transition: 0.3s ease-in-out, background 0.5s;
+        font-weight: 600;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+    }
+
+    .option:hover {
+        background: rgba(255,255,255,0.5);
+        transform: scale(1.03);
+    }
+    
+    .option.correct-flash {
+        background: linear-gradient(90deg, #6ef26e, #a7ff8c);
+        color: var(--main-color);
+        transform: scale(1.05);
+        box-shadow: 0 0 20px #a7ff8c;
+    }
+
+    .option.wrong-flash {
+        background: linear-gradient(90deg, #ff6666, #ff9999);
+        color: white;
+        transform: scale(0.98);
+    }
+
+    .hidden { display: none; }
+
+    button {
+        padding: 15px 35px;
+        border-radius: 30px;
+        background: var(--main-color);
+        color: white;
+        border: none;
+        font-size: 1.3em;
+        margin: 15px;
+        cursor: pointer;
+        transition: transform 0.3s, box-shadow 0.3s;
+        font-weight: 700;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+    }
+
+    button:hover {
+        transform: scale(1.05);
+        box-shadow: 0 6px 15px rgba(0, 0, 0, 0.6);
+    }
+    
+    #noBtn {
+        background: #993366;
+    }
+
+    /* Secret option styling */
+    .secret {
+        margin-top: 30px;
+        opacity: 0.85;
+        font-size: 1.1em;
+        padding: 15px 20px;
+        background: linear-gradient(45deg, rgba(255,255,255,0.1), rgba(255,255,255,0.3));
+        border-radius: 20px;
+        cursor: pointer;
+        z-index: 10;
+        transition: all 0.4s;
+        border: 2px solid var(--accent-color);
+        color: var(--accent-color);
+    }
+
+    .secret:hover {
+        opacity: 1;
+        background: rgba(255,255,255,0.4);
+        transform: scale(1.05) rotate(-1deg);
+        text-shadow: 0 0 10px var(--accent-color);
+    }
+
+    #finalText {
+        font-size: 1.4em;
+        font-family: 'Dancing Script', cursive;
+        background: linear-gradient(45deg, #ff6ec7, #fff0a5, #ffc3e0, #f9b5ff);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        font-weight: bold;
+        animation: float 4s ease-in-out infinite;
+        line-height: 1.5;
+        padding: 10px;
+        border: 2px dashed var(--accent-color);
+        border-radius: 15px;
+    }
+
+    @keyframes float {
+        0%,100% { transform: translateY(0) rotate(0deg); }
+        50% { transform: translateY(-10px) rotate(1deg); }
+    }
+
+    /* confetti canvas */
+    #confetti { position: fixed; top:0; left:0; width:100%; height:100%; z-index:99; pointer-events: none; }
+    
+    /* --- Game Styles --- */
+    #gameCanvas {
+        border: 4px solid var(--accent-color);
+        border-radius: 10px;
+        background: #a7ff8c;
+        cursor: pointer;
+        touch-action: manipulation; /* for better mobile interaction */
+    }
+
+    .game-area {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 15px;
+    }
+    
+    #gameStatus {
+        font-size: 1.5em;
+        font-weight: 700;
+        min-height: 1.5em;
+    }
+
+</style>
+</head>
+<body>
+<div class="heart-border"></div>
+
+<div id="quiz1" class="container">
+    <div class="question-title">A test of our magical beginning... ✨</div>
+    <h1>Question 1 💌</h1>
+    <h2>What did I reply to your story the first time?</h2>
+    <div class="option" onclick="wrong(this)">“Whose this cutie”</div>
+    <div class="option" onclick="wrong(this)">“Whose this pretty girl”</div>
+    <div class="option" onclick="wrong(this)">“Whose this hottie”</div>
+    <div class="option" onclick="nextQuestion('quiz2', this)">“Whose this diva” 💅</div>
+</div>
+
+<div id="quiz2" class="container hidden">
+    <div class="question-title">Our official anniversary... 🕰️</div>
+    <h1>Question 2 💘</h1>
+    <h2>When did I first say I love you?</h2>
+    <div class="option" onclick="nextQuestion('quiz3', this)">10 October 1:50 AM 🌙</div>
+    <div class="option" onclick="wrong(this)">9 October 10:53 PM</div>
+    <div class="option" onclick="wrong(this)">8 October 11:16 PM</div>
+    <div class="option" onclick="wrong(this)">11 October 2:34 AM</div>
+</div>
+
+<div id="quiz3" class="container hidden">
+    <div class="question-title">A true secret only my heart holds... 🤫</div>
+    <h1>Question 3 🥹</h1>
+    <h2>What does Sartaj like the **most** about you?</h2>
+    <div class="option" onclick="wrong(this)">Eyes 👀</div>
+    <div class="option" onclick="wrong(this)">Thighs 😳</div>
+    <div class="option" onclick="wrong(this)">Nose 👃</div>
+    <div class="option" onclick="wrong(this)">Cheeks 🥰</div>
+    <div class="option" onclick="wrong(this)">Hair 💇‍♀️</div>
+    <div class="option" onclick="wrong(this)">Lips 💋</div>
+    <div class="option" onclick="wrong(this)">Stomach 🫶</div>
+
+    <div class="option secret" onclick="nextQuestion('quiz4', this)">Her Everything 💞</div>
+</div>
+
+<div id="quiz4" class="container hidden">
+    <div class="question-title">Thinking of our future family... 🏡</div>
+    <h1>Question 4 🥂</h1>
+    <h2>What is the name of our future child?</h2>
+    <div class="option" onclick="wrong(this)">Gurshaan 👶</div>
+    <div class="option" onclick="nextQuestion('quiz5', this)">Hayat 💖</div>
+    <div class="option" onclick="wrong(this)">Mehtaab ⭐</div>
+    <div class="option" onclick="wrong(this)">Anya 🌸</div>
+</div>
+
+<div id="quiz5" class="container hidden">
+    <div class="question-title">A test of my family life... 👨‍👩‍👧‍👦</div>
+    <h1>Question 5 👨‍👩‍👧</h1>
+    <h2>What is my Bua's daughter's name?</h2>
+    <div class="option" onclick="wrong(this)">Sukhman 👧</div>
+    <div class="option" onclick="nextQuestion('quiz6', this)">Rajaswi 👑</div>
+    <div class="option" onclick="wrong(this)">Avneet 👱‍♀️</div>
+    <div class="option" onclick="wrong(this)">Kangan 💍</div>
+</div>
+
+<div id="quiz6" class="container hidden">
+    <div class="question-title">A peek into my snack drawer... 🍟</div>
+    <h1>Question 6 😋</h1>
+    <h2>What is my favourite Lays flavour?</h2>
+    <div class="option" onclick="wrong(this)">Yellow 💛</div>
+    <div class="option" onclick="wrong(this)">Orange 🧡</div>
+    <div class="option" onclick="wrong(this)">Blue 💙</div>
+    <div class="option" onclick="nextQuestion('quiz7', this)">Dark Green 💚</div>
+</div>
+
+<div id="quiz7" class="container hidden">
+    <div class="question-title">The one who holds my entire heart... 💖</div>
+    <h1>Question 7 🥰</h1>
+    <h2>What is the name of the person I love the most in my life?</h2>
+    <div class="option" onclick="wrong(this)">Nilaksh 🧑‍🤝‍🧑</div>
+    <div class="option" onclick="wrong(this)">Gourangi 👩‍🦱</div>
+    <div class="option" onclick="nextQuestion('game', this)">Yuvi 🐶</div>
+    <div class="option" onclick="wrong(this)">Gurnaaz (You, my Gugu) 🙈</div>
+</div>
+
+
+<div id="game" class="container hidden">
+    <div class="question-title">Master the obstacles to reach our future! Tap to make the heart fly!</div>
+    <h1>Flappy Heart Test 💓</h1>
+    <div class="game-area">
+        <canvas id="gameCanvas" width="450" height="400"></canvas>
+        <div id="gameStatus">Click the canvas to start! Glide for 10 seconds.</div>
+        <button id="continueAfterGame" class="hidden" onclick="nextQuestion('marry')">Continue to the Final Question ➡️</button>
+    </div>
+</div>
+
+<div id="marry" class="container hidden">
+    <div class="question-title">The most important moment of our lives... ⏳</div>
+    <h1>So now... 💍</h1>
+    <h2>Will you marry me, my Gugu? 🦄💖</h2>
+    <button id="yesBtn">Yes 💕 (Forever)</button>
+    <button id="noBtn">No 😜</button>
+</div>
+
+<div id="final" class="container hidden">
+    <canvas id="confetti"></canvas>
+    <h2>🧚 Fairies & Mermaids bring you a ring 💍✨</h2>
+    <p class="question-title">My words can never be enough, but here is my heart...</p>
+    <p id="finalText">
+        My dearest Gugu, my whole world, meri jaan, meri boondi ka laddoo, meri khand, meri cutiepie, meri khoye di barfi, meri matar paneer, meri shahi paneer, meri kadhai paneer, mera bacha, meri jalebi, mera rasgulla, meri rasmalai, meri cham cham, mera gulaab jamun, meri rabdi di icecream. My babyyyyyyy, you are the most beautiful soul, and the sheer joy you bring into my life is something I can never fully explain in words. **You are my everything, my past, my present, and my glorious future.** I love you soooooooooooooooooo soooooooooooooooooo soooooooooooooooooooo soooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo much. I hope your period pain is less now, my Gurnaaz, meri cutubutt. Lemme eyp mwahhhhhhhhhhhhhh 💋💞💞 Forever with you is the only dream I ever want to chase.
+    </p>
+</div>
+
+<script>
+// --- Quiz Logic ---
+function wrong(el) {
+    el.classList.add('wrong-flash');
+    el.classList.remove('correct-flash');
+    setTimeout(() => el.classList.remove('wrong-flash'), 600);
+}
+
+function nextQuestion(nextId, correctEl = null) {
+    if (correctEl) {
+        correctEl.classList.add('correct-flash');
+        correctEl.classList.remove('wrong-flash');
+        
+        setTimeout(() => {
+            document.querySelectorAll('.container').forEach(c => c.classList.add('hidden'));
+            const nextElement = document.getElementById(nextId);
+            if(nextElement) {
+                nextElement.classList.remove('hidden');
+                if (nextId === 'game') {
+                    // Start the game initialization
+                    initGame();
+                }
+            }
+        }, 500);
+
+    } else {
+        document.querySelectorAll('.container').forEach(c => c.classList.add('hidden'));
+        document.getElementById(nextId).classList.remove('hidden');
+    }
+}
+
+// --- Flappy Heart Game Logic (MAX EASE + Random Gaps) ---
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+let heart;
+let pipes = [];
+let gameLoop;
+let isPlaying = false;
+let startTime;
+const WIN_TIME = 10; // seconds
+
+function initGame() {
+    isPlaying = false;
+    pipes = [];
+    heart = {
+        x: 50,
+        y: canvas.height / 2,
+        radius: 15,
+        velocity: 0,
+        gravity: 0.05, // EXTREME GLIDE GRAVITY
+        jump: -2.5, // TINY JUMP
+        draw: function() {
+            // Draw a simple heart shape
+            ctx.fillStyle = '#ff4d6d';
+            ctx.beginPath();
+            ctx.moveTo(this.x, this.y + this.radius / 2);
+            ctx.arc(this.x - this.radius / 2, this.y, this.radius / 2, Math.PI / 4, Math.PI, true);
+            ctx.arc(this.x + this.radius / 2, this.y, this.radius / 2, 0, Math.PI * 3 / 4, true);
+            ctx.lineTo(this.x, this.y + this.radius * 1.5);
+            ctx.fill();
+        }
+    };
+
+    document.getElementById('gameStatus').innerText = "Click to Start! Glide for 10 seconds.";
+    document.getElementById('continueAfterGame').classList.add('hidden');
+    canvas.onclick = startGame;
+    document.addEventListener('keydown', handleJump);
+    
+    // Remove retry button if it exists
+    const oldRetryBtn = document.querySelector('#game > button:not(#continueAfterGame)');
+    if (oldRetryBtn) {
+        oldRetryBtn.remove();
+    }
+}
+
+function startGame() {
+    if (isPlaying) return;
+    isPlaying = true;
+    startTime = Date.now();
+    heart.velocity = heart.jump; // Initial jump
+    gameLoop = requestAnimationFrame(updateGame);
+    canvas.onclick = jumpHeart; // Change click handler to jump
+}
+
+function handleJump(e) {
+    if (isPlaying && (e.code === 'Space' || e.code === 'ArrowUp')) {
+        jumpHeart();
+    }
+}
+
+function jumpHeart() {
+    heart.velocity = heart.jump;
+}
+
+function createPipe() {
+    const pipeGap = 250; 
+    
+    // The total vertical space available is canvas.height.
+    // The top pipe can start at 0, and the bottom pipe must end at canvas.height.
+    // The movable range for the *top* of the bottom pipe is:
+    // Min: pipeGap (so the top pipe can be 0 high)
+    // Max: canvas.height - 30 (to leave a tiny bit of space at the bottom)
+    const minBottomStart = pipeGap + 20; // Ensure top pipe is at least 20px high
+    const maxBottomStart = canvas.height - 20; // Ensure bottom pipe is at least 20px high
+    
+    // Randomly choose the start position of the bottom pipe.
+    const bottomPipeStart = Math.floor(Math.random() * (maxBottomStart - minBottomStart + 1)) + minBottomStart;
+    
+    // The top pipe ends exactly pipeGap before the bottom pipe starts.
+    const topPipeEnd = bottomPipeStart - pipeGap;
+    
+    pipes.push({
+        x: canvas.width,
+        width: 30,
+        top: topPipeEnd, // Height of the top pipe segment
+        bottom: bottomPipeStart, // Y-coordinate where the bottom pipe begins
+        passed: false,
+        draw: function() {
+            ctx.fillStyle = '#94d82d'; // Top Pipe
+            ctx.fillRect(this.x, 0, this.width, this.top);
+            ctx.fillStyle = '#94d82d'; // Bottom Pipe
+            ctx.fillRect(this.x, this.bottom, this.width, canvas.height - this.bottom);
+        }
+    });
+}
+
+let frameCount = 0;
+const pipeInterval = 150; 
+
+function updateGame() {
+    if (!isPlaying) return;
+
+    // Clear canvas
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Update Heart
+    heart.velocity += heart.gravity;
+    heart.y += heart.velocity;
+    heart.draw();
+
+    // Generate Pipes
+    frameCount++;
+    if (frameCount % pipeInterval === 0) {
+        createPipe();
+    }
+
+    // Update and Draw Pipes
+    for (let i = 0; i < pipes.length; i++) {
+        pipes[i].x -= 0.5; // EXTREME SLOW PIPE SPEED
+        pipes[i].draw();
+
+        // Check for collision
+        if (heart.x + heart.radius > pipes[i].x && heart.x - heart.radius < pipes[i].x + pipes[i].width) {
+            if (heart.y - heart.radius < pipes[i].top || heart.y + heart.radius > pipes[i].bottom) {
+                endGame("CRASH! Your heart hit an obstacle. Try again!");
+                return;
+            }
+        }
+
+        // Clean up passed pipes
+        if (pipes[i].x + pipes[i].width < 0) {
+            pipes.splice(i, 1);
+            i--;
+        }
+    }
+
+    // Check boundary collision
+    if (heart.y + heart.radius > canvas.height || heart.y - heart.radius < 0) {
+        endGame("Ouch! Your heart flew too high or too low. Try again!");
+        return;
+    }
+
+    // Check Win Condition
+    const elapsedTime = Math.floor((Date.now() - startTime) / 1000);
+    if (elapsedTime >= WIN_TIME) {
+        endGame(`VICTORY! You survived for ${WIN_TIME} seconds! Our bond is unbreakable!`, true);
+        return;
+    }
+    
+    document.getElementById('gameStatus').innerText = `Time Remaining: ${WIN_TIME - elapsedTime} seconds!`;
+
+    gameLoop = requestAnimationFrame(updateGame);
+}
+
+function endGame(message, success = false) {
+    cancelAnimationFrame(gameLoop);
+    isPlaying = false;
+    canvas.onclick = null; // Disable clicks until reset
+    document.removeEventListener('keydown', handleJump);
+
+    document.getElementById('gameStatus').innerText = message;
+
+    if (success) {
+        document.getElementById('continueAfterGame').classList.remove('hidden');
+    } else {
+        // Reset button for a retry
+        const retryBtn = document.createElement('button');
+        retryBtn.innerText = "Try Again 🔄";
+        retryBtn.onclick = () => {
+            // Remove the retry button before starting the game again
+            const oldRetryBtn = document.querySelector('#game > button:not(#continueAfterGame)');
+            if (oldRetryBtn) oldRetryBtn.remove();
+            initGame();
+        };
+        document.getElementById('game').appendChild(retryBtn);
+    }
+}
+
+
+// --- Proposal Logic ---
+
+// No button moves away
+const noBtn = document.getElementById("noBtn");
+noBtn?.addEventListener("mouseover", () => {
+    const btnRect = noBtn.getBoundingClientRect();
+    let newX, newY;
+
+    const maxX = window.innerWidth * 0.7;
+    const maxY = window.innerHeight * 0.7;
+    
+    do {
+        newX = Math.random() * maxX;
+        newY = Math.random() * maxY;
+    } while (
+        newX > btnRect.left && newX < btnRect.right && 
+        newY > btnRect.top && newY < btnRect.bottom
+    );
+    
+    noBtn.style.position = "fixed";
+    noBtn.style.left = `${newX}px`;
+    noBtn.style.top = `${newY}px`;
+    noBtn.style.transition = "all 0.4s ease-out";
+});
+
+// Yes button leads to final
+document.getElementById("yesBtn")?.addEventListener("click", () => {
+    document.querySelectorAll('.container').forEach(c => c.classList.add('hidden'));
+    document.getElementById('final').classList.remove('hidden');
+    startConfetti();
+});
+
+
+// --- Confetti Logic ---
+
+function startConfetti() {
+    const confettiCanvas = document.getElementById("confetti");
+    const ctx = confettiCanvas.getContext("2d");
+    confettiCanvas.width = window.innerWidth;
+    confettiCanvas.height = window.innerHeight;
+    const pieces = [];
+    const colors = ['#ff6ec7', '#fff0a5', '#ffc3e0', '#f9b5ff', '#ff4d6d'];
+    
+    for(let i=0;i<250;i++){
+        pieces.push({
+            x: Math.random() * confettiCanvas.width,
+            y: Math.random() * confettiCanvas.height,
+            w: 10 + Math.random() * 5,
+            h: 10 + Math.random() * 5,
+            color: colors[Math.floor(Math.random() * colors.length)],
+            speed: Math.random() * 4 + 2,
+            rotation: Math.random() * 360,
+            rotationSpeed: Math.random() * 10 - 5
+        });
+    }
+
+    function draw(){
+        ctx.clearRect(0,0,confettiCanvas.width,confettiCanvas.height);
+        pieces.forEach(p=>{
+            ctx.save();
+            ctx.translate(p.x + p.w / 2, p.y + p.h / 2);
+            ctx.rotate(p.rotation * Math.PI / 180);
+            ctx.fillStyle = p.color;
+            ctx.fillRect(-p.w/2, -p.h/2, p.w, p.h);
+            ctx.restore();
+
+            p.y += p.speed;
+            p.rotation += p.rotationSpeed;
+            if(p.y > confettiCanvas.height) p.y = -p.h;
+        });
+        requestAnimationFrame(draw);
+    }
+    
+    window.addEventListener('resize', () => {
+        confettiCanvas.width = window.innerWidth;
+        confettiCanvas.height = window.innerHeight;
+    });
+
+    draw();
+}
+
+// Ensure game initializes when the page loads, but before it's displayed
+window.onload = initGame;
+</script>
+</body>
+</html>
